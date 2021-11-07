@@ -24,6 +24,8 @@ def _get_image(buffer: bytes, *, width: int, drop: bool = False, padding: bytes 
 
 
 def get_image(buffer: bytes, *, width: Union[int, str], drop: bool = False, padding: bytes = b"\x00") -> Image.Image:
+    """Gets image from binary."""
+
     if isinstance(width, str):
         width = _registry[width](len(buffer))
     return _get_image(buffer, width=width, drop=drop, padding=padding)
@@ -32,6 +34,8 @@ def get_image(buffer: bytes, *, width: Union[int, str], drop: bool = False, padd
 def convert_binary_to_image(
     binary_file: FilePath, image_file: FilePath, *, width: Union[int, str], drop: bool = False, padding: bytes = b"\x00"
 ) -> None:
+    """Converts binary file to image file."""
+
     with open(binary_file, "rb") as f:
         buffer = f.read()
     image = get_image(buffer, width=width, drop=drop, padding=padding)
@@ -48,6 +52,8 @@ def convert_binary_to_image_parallel(
     n_jobs=None,
     verbose=0,
 ) -> None:
+    """Converts binary file to image file in parallel."""
+
     Parallel(n_jobs=n_jobs, verbose=verbose)(
         delayed(convert_binary_to_image)(binary_file, image_file, width=width, drop=drop, padding=padding)
         for binary_file, image_file in zip(binary_files, image_files)
