@@ -10,7 +10,7 @@ __all__ = ["convert_bytes_to_binary", "convert_bytes_to_binary_parallel"]
 def convert_bytes_to_binary(bytes_file: FilePath, binary_file: FilePath) -> None:
     """Converts bytes file to binary file."""
 
-    with open(bytes_file, "r") as src, open(binary_file, "wb") as dst:
+    with open(bytes_file, "r", encoding="ascii") as src, open(binary_file, "wb") as dst:
         for line in src:
             i = line.find(" ")
             if i < 0:
