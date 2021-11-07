@@ -1,7 +1,9 @@
-from typing import Callable, Dict, Union
+from typing import Callable, Dict, Iterable, Union
 
 from joblib import Parallel, delayed
 from PIL import Image
+
+from .typing import FilePath
 
 __all__ = ["get_image", "convert_binary_to_image", "convert_binary_to_image_parallel"]
 
@@ -28,7 +30,7 @@ def get_image(buffer: bytes, *, width: Union[int, str], drop: bool = False, padd
 
 
 def convert_binary_to_image(
-    binary_file, image_file, *, width: Union[int, str], drop: bool = False, padding: bytes = b"\x00"
+    binary_file: FilePath, image_file: FilePath, *, width: Union[int, str], drop: bool = False, padding: bytes = b"\x00"
 ) -> None:
     with open(binary_file, "rb") as f:
         buffer = f.read()
@@ -37,8 +39,8 @@ def convert_binary_to_image(
 
 
 def convert_binary_to_image_parallel(
-    binary_files,
-    image_files,
+    binary_files: Iterable[FilePath],
+    image_files: Iterable[FilePath],
     *,
     width: Union[int, str],
     drop: bool = False,
