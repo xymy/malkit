@@ -1,9 +1,13 @@
+from typing import Iterable, Optional
+
 from joblib import Parallel, delayed
+
+from .typing import FilePath
 
 __all__ = ["convert_bytes_to_binary", "convert_bytes_to_binary_parallel"]
 
 
-def convert_bytes_to_binary(bytes_file, binary_file):
+def convert_bytes_to_binary(bytes_file: FilePath, binary_file: FilePath) -> None:
     """Converts bytes file to binary file."""
 
     with open(bytes_file, "r") as src, open(binary_file, "wb") as dst:
@@ -15,7 +19,9 @@ def convert_bytes_to_binary(bytes_file, binary_file):
             dst.write(bytes.fromhex(data))
 
 
-def convert_bytes_to_binary_parallel(bytes_files, binary_files, *, n_jobs=None, verbose=0):
+def convert_bytes_to_binary_parallel(
+    bytes_files: Iterable[FilePath], binary_files: Iterable[FilePath], *, n_jobs: Optional[int] = None, verbose: int = 0
+) -> None:
     """Converts bytes file to binary file in parallel."""
 
     Parallel(n_jobs=n_jobs, verbose=verbose)(
