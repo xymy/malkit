@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Callable, Optional, Tuple
+from typing import Any, Callable, List, Optional, Tuple
 
 import pandas as pd
 from PIL import Image
@@ -29,11 +29,11 @@ class LabeledDataset(Dataset):
         self._targets = [int(item) for item in labels.iloc[:, 1]]
 
     @property
-    def samples(self):
+    def samples(self) -> List[str]:
         return self._samples
 
     @property
-    def targets(self):
+    def targets(self) -> List[int]:
         return self._targets
 
     def __getitem__(self, index: int) -> Tuple[Any, Any]:

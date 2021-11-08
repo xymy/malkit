@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Iterable, Union
+from typing import Any, Callable, Dict, Iterable, Optional, Union
 
 from joblib import Parallel, delayed
 from PIL import Image
@@ -49,13 +49,13 @@ def convert_binary_to_image_parallel(
     width: Union[int, str],
     drop: bool = False,
     padding: bytes = b"\x00",
-    n_jobs=None,
-    verbose=0,
+    n_jobs: Optional[int] = None,
+    **kwargs: Any,
 ) -> None:
     """Converts binary file to image file in parallel."""
 
     delayed_function = delayed(convert_binary_to_image)
-    Parallel(n_jobs=n_jobs, verbose=verbose)(
+    Parallel(n_jobs=n_jobs, **kwargs)(
         delayed_function(binary_file, image_file, width=width, drop=drop, padding=padding)
         for binary_file, image_file in zip(binary_files, image_files)
     )
