@@ -24,7 +24,7 @@ class LabeledDataset(Dataset):
         labels: pd.DataFrame,
         *,
         cat: bool = False,
-        suffix: str = "",
+        suffix: Optional[str] = None,
     ) -> None:
         self.root = Path(root)
         self.loader = loader
@@ -62,7 +62,10 @@ class LabeledDataset(Dataset):
             sample_path = self.root / target_name / sample_name
         else:
             sample_path = self.root / sample_name
-        sample_path = sample_path.with_suffix(self.suffix)
+
+        # If ``suffix`` is an empty string, the suffix will be removed.
+        if self.suffix is not None:
+            sample_path = sample_path.with_suffix(self.suffix)
 
         sample = self.loader(sample_path)
         target = self._class_to_index[target_name]
@@ -79,7 +82,7 @@ class LabeledImageDataset(LabeledDataset):
         labels: pd.DataFrame,
         *,
         cat: bool = False,
-        suffix: str = ".png",
+        suffix: Optional[str] = ".png",
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
     ) -> None:
