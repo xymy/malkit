@@ -24,7 +24,7 @@ def convert_bytes_to_binary_parallel(
 ) -> None:
     """Converts bytes file to binary file in parallel."""
 
+    delayed_function = delayed(convert_bytes_to_binary)
     Parallel(n_jobs=n_jobs, verbose=verbose)(
-        delayed(convert_bytes_to_binary)(bytes_file, binary_file)
-        for bytes_file, binary_file in zip(bytes_files, binary_files)
+        delayed_function(bytes_file, binary_file) for bytes_file, binary_file in zip(bytes_files, binary_files)
     )

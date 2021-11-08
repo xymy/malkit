@@ -54,8 +54,9 @@ def convert_binary_to_image_parallel(
 ) -> None:
     """Converts binary file to image file in parallel."""
 
+    delayed_function = delayed(convert_binary_to_image)
     Parallel(n_jobs=n_jobs, verbose=verbose)(
-        delayed(convert_binary_to_image)(binary_file, image_file, width=width, drop=drop, padding=padding)
+        delayed_function(binary_file, image_file, width=width, drop=drop, padding=padding)
         for binary_file, image_file in zip(binary_files, image_files)
     )
 
