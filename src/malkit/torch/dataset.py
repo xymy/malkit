@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Callable, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import pandas as pd
 from PIL import Image
@@ -18,34 +18,54 @@ def pil_loader(path: FilePath) -> Image.Image:
 
 class LabeledDataset(Dataset):
     def __init__(
-        self, root: FilePath, loader: Callable[[FilePath], Any], labels: pd.DataFrame, *, cat: bool = False
+        self,
+        root: FilePath,
+        loader: Callable[[FilePath], Any],
+        labels: pd.DataFrame,
+        *,
+        cat: bool = False,
+        suffix: str = "",
     ) -> None:
         self.root = Path(root)
         self.loader = loader
         self.labels = labels
         self.cat = cat
+        self.suffix = suffix
 
-        self._samples = [str(item) for item in labels.iloc[:, 0]]
-        self._targets = [int(item) for item in labels.iloc[:, 1]]
+        self._sample_names = [str(item) for item in labels.iloc[:, 0]]
+        self._target_names = [str(item) for item in labels.iloc[:, 1]]
+
+        self._index_to_class = sorted(set(self._target_names))
+        self._class_to_index = {c: i for i, c in enumerate(self._index_to_class)}
 
     @property
-    def samples(self) -> List[str]:
-        return self._samples
+    def sample_names(self) -> List[str]:
+        return self._sample_names
 
     @property
-    def targets(self) -> List[int]:
-        return self._targets
+    def target_names(self) -> List[str]:
+        return self._target_names
 
-    def __getitem__(self, index: int) -> Tuple[Any, Any]:
-        filename = self.samples[index]
-        target = self.targets[index]
+    @property
+    def index_to_class(self) -> List[str]:
+        return self._index_to_class
+
+    @property
+    def class_to_index(self) -> Dict[str, int]:
+        return self._class_to_index
+
+    def __getitem__(self, index: int) -> Tuple[Any, int]:
+        sample_name = self._sample_names[index]
+        target_name = self._target_names[index]
 
         if self.cat:
-            sample_path = self.root / str(target) / filename
+            sample_path = self.root / target_name / sample_name
         else:
-            sample_path = self.root / filename
+            sample_path = self.root / sample_name
+        sample_path = sample_path.with_suffix(self.suffix)
 
         sample = self.loader(sample_path)
+        target = self._class_to_index[target_name]
         return sample, target
 
     def __len__(self) -> int:
@@ -59,10 +79,11 @@ class LabeledImageDataset(LabeledDataset):
         labels: pd.DataFrame,
         *,
         cat: bool = False,
+        suffix: str = ".png",
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
     ) -> None:
-        super().__init__(root, pil_loader, labels, cat=cat)
+        super().__init__(root, pil_loader, labels, cat=cat, suffix=suffix)
         self.transform = transform
         self.target_transform = target_transform
 
