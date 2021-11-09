@@ -10,10 +10,14 @@ from ..typing import FilePath
 __all__ = ["LabeledDataset", "LabeledImageDataset"]
 
 
-def pil_loader(path: FilePath) -> Image.Image:
-    with open(path, "rb") as f:
-        image = Image.open(f)
-        return image.convert()
+class PILLoader:
+    def __init__(self, mode: Optional[str] = None) -> None:
+        self.mode = mode
+
+    def __call__(self, path: FilePath) -> Image.Image:
+        with open(path, "rb") as f:
+            image = Image.open(f)
+            return image.convert(self.mode)
 
 
 class LabeledDataset(Dataset):
@@ -83,10 +87,12 @@ class LabeledImageDataset(LabeledDataset):
         *,
         cat: bool = False,
         suffix: Optional[str] = ".png",
+        loader_mode: Optional[str] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
     ) -> None:
-        super().__init__(root, pil_loader, labels, cat=cat, suffix=suffix)
+        loader = PILLoader(loader_mode)
+        super().__init__(root, loader, labels, cat=cat, suffix=suffix)
         self.transform = transform
         self.target_transform = target_transform
 
