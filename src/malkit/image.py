@@ -5,7 +5,13 @@ from PIL import Image
 
 from .typing import FilePath
 
-__all__ = ["get_image", "convert_binary_to_image", "convert_binary_to_image_parallel"]
+__all__ = [
+    "get_image",
+    "convert_binary_to_image",
+    "convert_binary_to_image_parallel",
+    "resize_image",
+    "resize_image_parallel",
+]
 
 
 def _get_image(buffer: bytes, *, width: int, drop: bool = False, padding: bytes = b"\x00") -> Image.Image:
@@ -58,6 +64,31 @@ def convert_binary_to_image_parallel(
     Parallel(n_jobs=n_jobs, **kwargs)(
         delayed_function(binary_file, image_file, width=width, drop=drop, padding=padding)
         for binary_file, image_file in zip(binary_files, image_files)
+    )
+
+
+def resize_image(src: FilePath, dst: FilePath, *, width: int, height: int) -> None:
+    """Resizes image file."""
+
+    image = Image.open(src)
+    image = image.resize((width, height), Image.BILINEAR)
+    image.save(dst)
+
+
+def resize_image_parallel(
+    srcs: Iterable[FilePath],
+    dsts: Iterable[FilePath],
+    *,
+    width: int,
+    height: int,
+    n_jobs: Optional[int] = None,
+    **kwargs: Any,
+) -> None:
+    """Resizes image file in parallel."""
+
+    delayed_function = delayed(resize_image)
+    Parallel(n_jobs=n_jobs, **kwargs)(
+        delayed_function(src, dst, width=width, height=height) for src, dst in zip(srcs, dsts)
     )
 
 
