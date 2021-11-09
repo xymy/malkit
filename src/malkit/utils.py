@@ -1,8 +1,7 @@
 from typing import Any, Iterable, Optional
 
-from joblib import Parallel, delayed
-
-from .typing import FilePath
+from ._parallel import execute_parallel
+from ._typing import FilePath
 
 __all__ = ["convert_bytes_to_binary", "convert_bytes_to_binary_parallel"]
 
@@ -24,7 +23,4 @@ def convert_bytes_to_binary_parallel(
 ) -> None:
     """Converts bytes file to binary file in parallel."""
 
-    delayed_function = delayed(convert_bytes_to_binary)
-    Parallel(n_jobs=n_jobs, **kwargs)(
-        delayed_function(bytes_file, binary_file) for bytes_file, binary_file in zip(bytes_files, binary_files)
-    )
+    execute_parallel(convert_bytes_to_binary, bytes_files, binary_files, n_jobs=n_jobs, **kwargs)

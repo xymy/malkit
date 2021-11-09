@@ -1,9 +1,10 @@
+import functools
 from typing import Any, Callable, Dict, Iterable, Optional, Union
 
-from joblib import Parallel, delayed
 from PIL import Image
 
-from .typing import FilePath
+from ._parallel import execute_parallel
+from ._typing import FilePath
 
 __all__ = [
     "get_image",
@@ -60,11 +61,8 @@ def convert_binary_to_image_parallel(
 ) -> None:
     """Converts binary file to image file in parallel."""
 
-    delayed_function = delayed(convert_binary_to_image)
-    Parallel(n_jobs=n_jobs, **kwargs)(
-        delayed_function(binary_file, image_file, width=width, drop=drop, padding=padding)
-        for binary_file, image_file in zip(binary_files, image_files)
-    )
+    function = functools.partial(convert_binary_to_image, width=width, drop=drop, padding=padding)
+    execute_parallel(function, binary_files, image_files, n_jobs=n_jobs, **kwargs)
 
 
 def resize_image(src: FilePath, dst: FilePath, *, width: int, height: int) -> None:
@@ -86,10 +84,8 @@ def resize_image_parallel(
 ) -> None:
     """Resizes image file in parallel."""
 
-    delayed_function = delayed(resize_image)
-    Parallel(n_jobs=n_jobs, **kwargs)(
-        delayed_function(src, dst, width=width, height=height) for src, dst in zip(srcs, dsts)
-    )
+    function = functools.partial(resize_image, width=width, height=height)
+    execute_parallel(function, srcs, dsts, n_jobs=n_jobs, **kwargs)
 
 
 def _width_function_nkjm(filesize: int) -> int:
