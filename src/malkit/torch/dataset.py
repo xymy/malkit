@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 
 from .._typing import FilePath
 
-__all__ = ["LabeledDataset", "LabeledImageDataset"]
+__all__ = ["LabeledDataset", "LabeledImageDataset", "UnlabeledDataset", "UnlabeledImageDataset"]
 
 
 class PILLoader:
@@ -78,13 +78,13 @@ class LabeledDataset(Dataset):
     def __len__(self) -> int:
         return len(self.labels)
 
-    def __repr__(self):
-        return (
-            f"{type(self).__name__}:\n"
-            f"    Root directory: {self.root}"
-            f"    Number of samples: {len(self)}\n"
-            f"    Number of classes: {len(self.index_to_class)}\n"
-        )
+    def __repr__(self) -> str:
+        s = ""
+        s += f"{type(self).__name__}:\n"
+        s += f"    Root directory: {self.root}"
+        s += f"    Number of samples: {len(self)}\n"
+        s += f"    Number of classes: {len(self.index_to_class)}\n"
+        return s
 
 
 class LabeledImageDataset(LabeledDataset):
@@ -111,3 +111,45 @@ class LabeledImageDataset(LabeledDataset):
         if self.target_transform is not None:
             target = self.target_transform(target)
         return sample, target
+
+
+class UnlabeledDataset(Dataset):
+    def __init__(self, root: FilePath, loader: Callable[[FilePath], Any]) -> None:
+        self.root = Path(root)
+        self.loader = loader
+
+        self._sample_paths = [entry for entry in self.root.iterdir()]
+
+    def __getitem__(self, index: int) -> Any:
+        sample_path = self._sample_paths[index]
+        sample = self.loader(sample_path)
+        return sample
+
+    def __len__(self) -> int:
+        return len(self._sample_paths)
+
+    def __repr__(self) -> str:
+        s = ""
+        s += f"{type(self).__name__}:\n"
+        s += f"    Root directory: {self.root}"
+        s += f"    Number of samples: {len(self)}\n"
+        return s
+
+
+class UnlabeledImageDataset(UnlabeledDataset):
+    def __init__(
+        self,
+        root: FilePath,
+        *,
+        loader_mode: Optional[str] = None,
+        transform: Optional[Callable] = None,
+    ) -> None:
+        loader = PILLoader(loader_mode)
+        super().__init__(root, loader)
+        self.transform = transform
+
+    def __getitem__(self, index: int) -> Any:
+        sample = super().__getitem__(index)
+        if self.transform is not None:
+            sample = self.transform(sample)
+        return sample
