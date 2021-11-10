@@ -96,7 +96,7 @@ class LabeledImageDataset(LabeledDataset):
         self.transform = transform
         self.target_transform = target_transform
 
-    def __getitem__(self, index: int) -> Tuple[Any, Any]:
+    def __getitem__(self, index: int) -> Tuple[Any, int]:
         sample, target = super().__getitem__(index)
         if self.transform is not None:
             sample = self.transform(sample)
