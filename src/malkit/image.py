@@ -30,8 +30,6 @@ def _get_image(binary: bytes, *, width: int, drop: bool = False, padding: bytes 
 
 
 def get_image(binary: bytes, *, width: Union[int, str], drop: bool = False, padding: bytes = b"\x00") -> Image.Image:
-    """Gets image from binary."""
-
     if isinstance(width, str):
         width = _registry[width](len(binary))
     return _get_image(binary, width=width, drop=drop, padding=padding)

@@ -78,6 +78,14 @@ class LabeledDataset(Dataset):
     def __len__(self) -> int:
         return len(self.labels)
 
+    def __repr__(self):
+        return (
+            f"{type(self).__name__}:\n"
+            f"    Root directory: {self.root}"
+            f"    Number of samples: {len(self)}\n"
+            f"    Number of classes: {len(self.index_to_class)}\n"
+        )
+
 
 class LabeledImageDataset(LabeledDataset):
     def __init__(
