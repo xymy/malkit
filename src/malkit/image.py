@@ -7,7 +7,6 @@ from ._parallel import execute_parallel
 from ._typing import FilePath
 
 __all__ = [
-    "get_image",
     "convert_binary_to_image",
     "convert_binary_to_image_parallel",
     "resize_image",
@@ -15,27 +14,27 @@ __all__ = [
 ]
 
 
-def _get_image(buffer: bytes, *, width: int, drop: bool = False, padding: bytes = b"\x00") -> Image.Image:
-    nbytes = len(buffer)
+def _get_image(binary: bytes, *, width: int, drop: bool = False, padding: bytes = b"\x00") -> Image.Image:
+    nbytes = len(binary)
     height, rem = divmod(nbytes, width)
     if rem != 0:
         # The image height must be at least 1.
         if drop and height > 0:
             nbytes = width * height
-            buffer = buffer[:nbytes]
+            binary = binary[:nbytes]
         else:
             height += 1
             nbytes = width * height
-            buffer = buffer.ljust(nbytes, padding)
-    return Image.frombuffer("L", (width, height), buffer, "raw", "L", 0, 1)
+            binary = binary.ljust(nbytes, padding)
+    return Image.frombuffer("L", (width, height), binary, "raw", "L", 0, 1)
 
 
-def get_image(buffer: bytes, *, width: Union[int, str], drop: bool = False, padding: bytes = b"\x00") -> Image.Image:
+def get_image(binary: bytes, *, width: Union[int, str], drop: bool = False, padding: bytes = b"\x00") -> Image.Image:
     """Gets image from binary."""
 
     if isinstance(width, str):
-        width = _registry[width](len(buffer))
-    return _get_image(buffer, width=width, drop=drop, padding=padding)
+        width = _registry[width](len(binary))
+    return _get_image(binary, width=width, drop=drop, padding=padding)
 
 
 def convert_binary_to_image(
@@ -44,8 +43,8 @@ def convert_binary_to_image(
     """Converts binary file to image file."""
 
     with open(binary_file, "rb") as f:
-        buffer = f.read()
-    image = get_image(buffer, width=width, drop=drop, padding=padding)
+        binary = f.read()
+    image = get_image(binary, width=width, drop=drop, padding=padding)
     image.save(image_file)
 
 

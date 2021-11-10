@@ -6,7 +6,7 @@ from ._typing import FilePath
 
 
 def execute_parallel(
-    function: Callable,
+    function: Callable[[FilePath, FilePath], Any],
     srcs: Iterable[FilePath],
     dsts: Iterable[FilePath],
     *,
