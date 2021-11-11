@@ -81,7 +81,7 @@ class LabeledDataset(Dataset):
     def __repr__(self) -> str:
         s = ""
         s += f"{type(self).__name__}:\n"
-        s += f"    Root directory: {self.root}"
+        s += f"    Root directory: {self.root}\n"
         s += f"    Number of samples: {len(self)}\n"
         s += f"    Number of classes: {len(self.index_to_class)}\n"
         return s
@@ -131,7 +131,7 @@ class UnlabeledDataset(Dataset):
     def __repr__(self) -> str:
         s = ""
         s += f"{type(self).__name__}:\n"
-        s += f"    Root directory: {self.root}"
+        s += f"    Root directory: {self.root}\n"
         s += f"    Number of samples: {len(self)}\n"
         return s
 
