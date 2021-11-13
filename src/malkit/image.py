@@ -85,7 +85,7 @@ def resize_image_parallel(
     execute_parallel(function, srcs, dsts, n_jobs=n_jobs, **kwargs)
 
 
-def _width_function_nkjm(filesize: int) -> int:
+def width_function_nkjm(filesize: int) -> int:
     k = filesize // 1024
     if k < 10:
         width = 32
@@ -106,4 +106,4 @@ def _width_function_nkjm(filesize: int) -> int:
     return width
 
 
-_registry: Dict[str, Callable[[int], int]] = {"nkjm": _width_function_nkjm}
+_registry: Dict[str, Callable[[int], int]] = {"nkjm": width_function_nkjm}
