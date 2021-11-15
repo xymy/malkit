@@ -95,7 +95,7 @@ class LabeledImageDataset(LabeledDataset):
         *,
         cat: bool = False,
         suffix: Optional[str] = ".png",
-        loader_mode: Optional[str] = None,
+        loader_mode: Optional[str] = "L",
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
     ) -> None:
@@ -141,7 +141,7 @@ class UnlabeledImageDataset(UnlabeledDataset):
         self,
         root: FilePath,
         *,
-        loader_mode: Optional[str] = None,
+        loader_mode: Optional[str] = "L",
         transform: Optional[Callable] = None,
     ) -> None:
         loader = PILLoader(loader_mode)
