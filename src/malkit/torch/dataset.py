@@ -114,16 +114,29 @@ class LabeledImageDataset(LabeledDataset):
 
 
 class UnlabeledDataset(Dataset):
-    def __init__(self, root: FilePath, loader: Callable[[FilePath], Any]) -> None:
+    def __init__(
+        self,
+        root: FilePath,
+        loader: Callable[[FilePath], Any],
+        *,
+        suffix: Optional[str] = None,
+    ) -> None:
         self.root = Path(root)
         self.loader = loader
+        self.suffix = suffix
 
-        self._sample_paths = [entry for entry in self.root.iterdir()]
+        self._sample_paths = sorted(entry for entry in self.root.iterdir())
 
-    def __getitem__(self, index: int) -> Any:
+    def __getitem__(self, index: int) -> Tuple[Any, str]:
         sample_path = self._sample_paths[index]
+
+        if self.suffix is not None:
+            sample_name = sample_path.with_suffix(self.suffix).name
+        else:
+            sample_name = sample_path.name
+
         sample = self.loader(sample_path)
-        return sample
+        return sample, sample_name
 
     def __len__(self) -> int:
         return len(self._sample_paths)
@@ -141,15 +154,16 @@ class UnlabeledImageDataset(UnlabeledDataset):
         self,
         root: FilePath,
         *,
+        suffix: Optional[str] = "",
         loader_mode: Optional[str] = "L",
         transform: Optional[Callable] = None,
     ) -> None:
         loader = PILLoader(loader_mode)
-        super().__init__(root, loader)
+        super().__init__(root, loader, suffix=suffix)
         self.transform = transform
 
-    def __getitem__(self, index: int) -> Any:
-        sample = super().__getitem__(index)
+    def __getitem__(self, index: int) -> Tuple[Any, str]:
+        sample, sample_name = super().__getitem__(index)
         if self.transform is not None:
             sample = self.transform(sample)
-        return sample
+        return sample, sample_name
