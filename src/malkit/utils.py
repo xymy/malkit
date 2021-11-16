@@ -1,13 +1,14 @@
 import functools
 from pathlib import Path
-from typing import Any, Iterable, Optional
+from typing import Any, Iterable, Optional, Tuple
 
+import numpy as np
 import pandas as pd
 
 from ._parallel import execute_parallel
 from ._typing import FilePath
 
-__all__ = ["categorize_folder", "convert_bytes_to_binary", "convert_bytes_to_binary_parallel"]
+__all__ = ["categorize_folder", "split_labels", "convert_bytes_to_binary", "convert_bytes_to_binary_parallel"]
 
 
 def categorize_folder(root: FilePath, labels: pd.DataFrame, *, suffix: Optional[str] = None) -> bool:
@@ -27,6 +28,17 @@ def categorize_folder(root: FilePath, labels: pd.DataFrame, *, suffix: Optional[
             src = src.with_suffix(suffix)
         dst = root / target_name / sample_name
         src.rename(dst)
+
+
+def split_labels(
+    labels: pd.DataFrame, *, test_size: Optional[float] = None, train_size: Optional[float] = None, shuffle=True
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    from sklearn.model_selection import train_test_split
+
+    X = np.arange(len(labels))
+    y = labels.iloc[:, 1].to_numpy()
+    X1, X2 = train_test_split(X, test_size=test_size, train_size=train_size, shuffle=shuffle, stratify=y)
+    return labels.iloc[X1], labels.iloc[X2]
 
 
 def convert_bytes_to_binary(bytes_file: FilePath, binary_file: FilePath, *, qq: str = "00") -> None:
