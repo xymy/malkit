@@ -12,6 +12,8 @@ __all__ = ["categorize_folders", "split_labels", "convert_bytes_to_binary", "con
 
 
 def categorize_folders(root: FilePath, labels: pd.DataFrame, *, suffix: Optional[str] = None) -> bool:
+    """Categorizes samples and moves them into categorized folders."""
+
     root = Path(root)
     sample_names = [str(item) for item in labels.iloc[:, 0]]
     target_names = [str(item) for item in labels.iloc[:, 1]]
@@ -33,6 +35,8 @@ def categorize_folders(root: FilePath, labels: pd.DataFrame, *, suffix: Optional
 def split_labels(
     labels: pd.DataFrame, *, test_size: Optional[float] = None, train_size: Optional[float] = None, shuffle=True
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Splits labels into two parts."""
+
     from sklearn.model_selection import train_test_split
 
     X = np.arange(len(labels))
