@@ -8,10 +8,10 @@ import pandas as pd
 from ._parallel import execute_parallel
 from ._typing import FilePath
 
-__all__ = ["categorize_folder", "split_labels", "convert_bytes_to_binary", "convert_bytes_to_binary_parallel"]
+__all__ = ["categorize_folders", "split_labels", "convert_bytes_to_binary", "convert_bytes_to_binary_parallel"]
 
 
-def categorize_folder(root: FilePath, labels: pd.DataFrame, *, suffix: Optional[str] = None) -> bool:
+def categorize_folders(root: FilePath, labels: pd.DataFrame, *, suffix: Optional[str] = None) -> bool:
     root = Path(root)
     sample_names = [str(item) for item in labels.iloc[:, 0]]
     target_names = [str(item) for item in labels.iloc[:, 1]]
