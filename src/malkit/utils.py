@@ -12,7 +12,7 @@ __all__ = ["categorize_folders", "split_labels", "convert_bytes_to_binary", "con
 
 
 def categorize_folders(root: FilePath, labels: pd.DataFrame, *, suffix: Optional[str] = None) -> bool:
-    """Categorizes samples and moves them into class name folders."""
+    """Categorize samples and move them into class name folders."""
 
     root = Path(root)
     sample_names = [str(item) for item in labels.iloc[:, 0]]
@@ -35,7 +35,7 @@ def categorize_folders(root: FilePath, labels: pd.DataFrame, *, suffix: Optional
 def split_labels(
     labels: pd.DataFrame, *, test_size: Optional[float] = None, train_size: Optional[float] = None, shuffle=True
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Splits labels into two parts."""
+    """Split labels into two parts."""
 
     from sklearn.model_selection import train_test_split
 
@@ -46,7 +46,7 @@ def split_labels(
 
 
 def convert_bytes_to_binary(bytes_file: FilePath, binary_file: FilePath, *, qq: str = "00") -> None:
-    """Converts bytes file to binary file."""
+    """Convert bytes file to binary file."""
 
     with open(bytes_file, "r", encoding="ascii") as src, open(binary_file, "wb") as dst:
         for line in src:
@@ -65,7 +65,7 @@ def convert_bytes_to_binary_parallel(
     n_jobs: Optional[int] = None,
     **kwargs: Any,
 ) -> None:
-    """Converts bytes file to binary file in parallel."""
+    """Convert bytes file to binary file in parallel."""
 
     function = functools.partial(convert_bytes_to_binary, qq=qq)
     execute_parallel(function, bytes_files, binary_files, n_jobs=n_jobs, **kwargs)

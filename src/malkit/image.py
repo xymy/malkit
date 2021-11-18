@@ -38,7 +38,7 @@ def get_image(binary: bytes, *, width: Union[int, str], drop: bool = False, padd
 def convert_binary_to_image(
     binary_file: FilePath, image_file: FilePath, *, width: Union[int, str], drop: bool = False, padding: bytes = b"\x00"
 ) -> None:
-    """Converts binary file to image file."""
+    """Convert binary file to image file."""
 
     with open(binary_file, "rb") as f:
         binary = f.read()
@@ -56,14 +56,14 @@ def convert_binary_to_image_parallel(
     n_jobs: Optional[int] = None,
     **kwargs: Any,
 ) -> None:
-    """Converts binary file to image file in parallel."""
+    """Convert binary file to image file in parallel."""
 
     function = functools.partial(convert_binary_to_image, width=width, drop=drop, padding=padding)
     execute_parallel(function, binary_files, image_files, n_jobs=n_jobs, **kwargs)
 
 
 def resize_image(src: FilePath, dst: FilePath, *, width: int, height: int) -> None:
-    """Resizes image file."""
+    """Resize image file."""
 
     image = Image.open(src)
     image = image.resize((width, height), Image.BILINEAR)
@@ -79,7 +79,7 @@ def resize_image_parallel(
     n_jobs: Optional[int] = None,
     **kwargs: Any,
 ) -> None:
-    """Resizes image file in parallel."""
+    """Resize image file in parallel."""
 
     function = functools.partial(resize_image, width=width, height=height)
     execute_parallel(function, srcs, dsts, n_jobs=n_jobs, **kwargs)
