@@ -1,4 +1,5 @@
 import functools
+import shutil
 from pathlib import Path
 from typing import Any, Iterable, Optional, Tuple
 
@@ -28,20 +29,29 @@ def categorize_folders(root: FilePath, labels: pd.DataFrame, *, suffix: Optional
         src = root / sample_name
         if suffix is not None:
             src = src.with_suffix(suffix)
-        dst = root / target_name / sample_name
-        src.rename(dst)
+        shutil.move(src, root / target_name)
 
 
 def split_labels(
-    labels: pd.DataFrame, *, test_size: Optional[float] = None, train_size: Optional[float] = None, shuffle=True
+    labels: pd.DataFrame,
+    *,
+    test_size: Optional[float] = None,
+    train_size: Optional[float] = None,
+    shuffle: bool = True,
+    stratified: bool = True,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Split labels into two parts."""
 
     from sklearn.model_selection import train_test_split
 
-    X = np.arange(len(labels))
-    y = labels.iloc[:, 1].to_numpy()
-    idx1, idx2 = train_test_split(X, test_size=test_size, train_size=train_size, shuffle=shuffle, stratify=y)
+    indices = np.arange(len(labels))
+    if shuffle and stratified:
+        stratify = labels.iloc[:, 1].to_numpy()
+    else:
+        stratify = None
+    idx1, idx2 = train_test_split(
+        indices, test_size=test_size, train_size=train_size, shuffle=shuffle, stratify=stratify
+    )
     return labels.iloc[idx1], labels.iloc[idx2]
 
 
