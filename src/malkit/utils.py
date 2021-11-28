@@ -1,7 +1,7 @@
 import functools
 import shutil
 from pathlib import Path
-from typing import Any, Iterable, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -9,7 +9,13 @@ import pandas as pd
 from ._parallel import execute_parallel
 from ._typing import FilePath
 
-__all__ = ["categorize_folders", "split_labels", "convert_bytes_to_binary", "convert_bytes_to_binary_parallel"]
+__all__ = [
+    "categorize_folders",
+    "split_labels",
+    "build_srcs_dsts",
+    "convert_bytes_to_binary",
+    "convert_bytes_to_binary_parallel",
+]
 
 
 def categorize_folders(root: FilePath, labels: pd.DataFrame, *, suffix: Optional[str] = None) -> bool:
@@ -53,6 +59,56 @@ def split_labels(
         indices, test_size=test_size, train_size=train_size, shuffle=shuffle, stratify=stratify
     )
     return labels.iloc[idx1], labels.iloc[idx2]
+
+
+def _build_srcs_dsts(
+    src_dir: Path, dst_dir: Path, *, skip_exist: bool = True, suffix: Optional[str] = None
+) -> Tuple[List[Path], List[Path]]:
+    srcs = []
+    dsts = []
+    dst_dir.mkdir(parents=True, exist_ok=True)
+    for src in src_dir.iterdir():
+        if suffix is not None:
+            src = src.with_suffix(suffix)
+        dst = dst_dir / src.name
+        if skip_exist and dst.exists():
+            continue
+        srcs.append(src)
+        dsts.append(dst)
+    return srcs, dsts
+
+
+def _build_srcs_dsts_cat(
+    src_dir: Path, dst_dir: Path, *, skip_exist: bool = True, suffix: Optional[str] = None
+) -> Tuple[List[Path], List[Path]]:
+    srcs = []
+    dsts = []
+    dst_dir.mkdir(parents=True, exist_ok=True)
+    for src_cat_dir in src_dir.iterdir():
+        dst_cat_dir = dst_dir / src_cat_dir.name
+        dst_cat_dir.mkdir(parents=True, exist_ok=True)
+        for src in src_cat_dir.iterdir():
+            if suffix is not None:
+                src = src.with_suffix(suffix)
+            dst = dst_cat_dir / src.name
+            if skip_exist and dst.exists():
+                continue
+            srcs.append(src)
+            dsts.append(dst)
+    return srcs, dsts
+
+
+def build_srcs_dsts(
+    src_dir: FilePath, dst_dir: FilePath, *, cat: bool = True, skip_exist: bool = True, suffix: Optional[str] = None
+) -> Tuple[List[Path], List[Path]]:
+    """Build source paths and destination paths."""
+
+    src_dir = Path(src_dir)
+    dst_dir = Path(dst_dir)
+    if cat:
+        return _build_srcs_dsts_cat(src_dir, dst_dir, suffix=suffix, skip_exist=skip_exist)
+    else:
+        return _build_srcs_dsts(src_dir, dst_dir, suffix=suffix, skip_exist=skip_exist)
 
 
 def convert_bytes_to_binary(bytes_file: FilePath, binary_file: FilePath, *, qq: str = "00") -> None:
