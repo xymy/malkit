@@ -62,6 +62,8 @@ class Checkpoint:
         self.max_save = max_save
         self.queue = PriorityQueue(capacity=max_save, cmp=cmp)
 
+        self.root.mkdir(parents=True, exist_ok=True)
+
     def save(
         self,
         check_dict: Mapping[str, Any],
