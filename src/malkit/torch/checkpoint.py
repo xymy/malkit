@@ -64,7 +64,7 @@ class Checkpoint:
 
     def save(
         self,
-        checkpoint: Mapping[str, Any],
+        check_dict: Mapping[str, Any],
         metric_name: str,
         metric_value: Union[int, float],
         global_step: Optional[int] = None,
@@ -80,10 +80,10 @@ class Checkpoint:
         else:
             filename += f"_{metric_name}={metric_value:.4f}.pt"
 
-        state_dicts = {}
-        for key, obj in checkpoint.items():
-            state_dicts[key] = obj.state_dict()
-        torch.save(state_dicts, self.root / filename)
+        state_dict = {}
+        for key, obj in check_dict.items():
+            state_dict[key] = obj.state_dict()
+        torch.save(state_dict, self.root / filename)
 
         old = self.queue.update(metric_value, filename)
         if old is not None:
@@ -91,9 +91,9 @@ class Checkpoint:
             oldpath.unlink(missing_ok=True)
 
     @staticmethod
-    def load(checkpoint: Mapping[str, Any], filepath: FilePath, map_location=None) -> None:
-        state_dicts = torch.load(filepath, map_location=map_location)
-        for key, obj in checkpoint.items():
-            if key not in state_dicts:
+    def load(check_dict: Mapping[str, Any], filepath: FilePath, map_location=None) -> None:
+        state_dict = torch.load(filepath, map_location=map_location)
+        for key, obj in check_dict.items():
+            if key not in state_dict:
                 raise ValueError(f"{key} does not exist")
-            obj.load_state_dict(state_dicts[key])
+            obj.load_state_dict(state_dict[key])
