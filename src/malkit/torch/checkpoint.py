@@ -11,7 +11,7 @@ from .._typing import FilePath
 __all__ = ["Checkpoint"]
 
 
-@dataclass
+@dataclass(order=True)
 class Item:
     priority: Union[int, float]
     filename: str = field(compare=False)
