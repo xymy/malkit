@@ -18,7 +18,7 @@ __all__ = [
 ]
 
 
-def categorize_folders(root: FilePath, labels: pd.DataFrame, *, suffix: Optional[str] = None) -> bool:
+def categorize_folders(root: FilePath, labels: pd.DataFrame, *, suffix: Optional[str] = None) -> None:
     """Categorize samples and move them into class name folders."""
 
     root = Path(root)
