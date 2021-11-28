@@ -1,8 +1,7 @@
-import functools
 import operator
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, List, Mapping, Optional, Union
+from typing import Any, List, Mapping, Optional, Union
 
 import torch
 
@@ -18,14 +17,17 @@ class Item:
 
 
 class PriorityQueue:
-    def __init__(self, *, capacity: int = 1, cmp: Callable = operator.lt) -> None:
+    def __init__(self, *, capacity: int = 1, reverse: bool = False) -> None:
         if capacity < 1:
             raise ValueError(f"require capacity >= 1, got {capacity!r}")
 
         self._queue: List[Item] = []
         self._capacity = capacity
-        self._cmp = cmp
-        self._key = functools.cmp_to_key(cmp)
+        self._reverse = reverse
+        if reverse:
+            self._cmp = operator.gt
+        else:
+            self._cmp = operator.lt
 
     def __len__(self) -> int:
         return len(self._queue)
@@ -47,7 +49,7 @@ class PriorityQueue:
             raise ValueError("queue is full")
         item = Item(priority, filename)
         self._queue.append(item)
-        self._queue.sort(key=self._key)
+        self._queue.sort(reverse=self._reverse)
 
     def pop(self) -> Item:
         if not self:
@@ -56,11 +58,11 @@ class PriorityQueue:
 
 
 class Checkpoint:
-    def __init__(self, root: FilePath, filename_prefix: str, max_save: int = 1, cmp: Callable = operator.lt) -> None:
+    def __init__(self, root: FilePath, filename_prefix: str, max_save: int = 1, reverse: bool = False) -> None:
         self.root = Path(root)
         self.filename_prefix = filename_prefix
         self.max_save = max_save
-        self.queue = PriorityQueue(capacity=max_save, cmp=cmp)
+        self.queue = PriorityQueue(capacity=max_save, reverse=reverse)
 
         self.root.mkdir(parents=True, exist_ok=True)
 
