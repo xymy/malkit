@@ -18,7 +18,7 @@ def convert_binary_to_byte_seq(
         binary = f.read(length)
     byte_seq: np.ndarray = np.frombuffer(binary, dtype=np.uint8)
     byte_seq = byte_seq.astype(dtype=np.int32)
-    with open(byte_seq_file, "rb") as f:
+    with open(byte_seq_file, "wb") as f:
         f.write(byte_seq.tobytes())
         padding_length = length - len(binary)
         if padding_length > 0:
