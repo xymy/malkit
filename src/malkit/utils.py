@@ -74,9 +74,11 @@ def _build_srcs_dsts(
     dsts = []
     dst_dir.mkdir(parents=True, exist_ok=True)
     for src in src_dir.iterdir():
-        if suffix is not None:
-            src = src.with_suffix(suffix)
-        dst = dst_dir / src.name
+        if suffix is None:
+            name = src.name
+        else:
+            name = src.with_suffix(suffix).name
+        dst = dst_dir / name
         if skip_exist and dst.exists():
             continue
         srcs.append(src)
@@ -94,9 +96,11 @@ def _build_srcs_dsts_cat(
         dst_cat_dir = dst_dir / src_cat_dir.name
         dst_cat_dir.mkdir(parents=True, exist_ok=True)
         for src in src_cat_dir.iterdir():
-            if suffix is not None:
-                src = src.with_suffix(suffix)
-            dst = dst_cat_dir / src.name
+            if suffix is None:
+                name = src.name
+            else:
+                name = src.with_suffix(suffix).name
+            dst = dst_cat_dir / name
             if skip_exist and dst.exists():
                 continue
             srcs.append(src)
