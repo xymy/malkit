@@ -26,7 +26,7 @@ def convert_binary_to_byte_seq(
     # Compress byte sequence via gzip.
     with gzip.open(byte_seq_file, "wb") as f:
         f.write(byte_seq.tobytes())
-        padding_length = length - len(buffer)
+        padding_length = length - len(byte_seq)
         if padding_length > 0:
             padding_seq = np.full(padding_length, padding, dtype=np.int32)
             f.write(padding_seq.tobytes())
