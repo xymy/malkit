@@ -11,7 +11,7 @@ from .._typing import FilePath
 
 __all__ = [
     "LabeledDataset",
-    "LabeledByteSequenceDataset",
+    "LabeledByteSeqDataset",
     "LabeledImageDataset",
     "UnlabeledDataset",
     "UnlabeledImageDataset",
@@ -28,7 +28,7 @@ class PILLoader:
             return image.convert(self.mode)
 
 
-class ByteSequenceLoader:
+class ByteSeqLoader:
     def __init__(self, length: int, padding: int = 256) -> None:
         self.length = length
         self.padding = padding
@@ -111,7 +111,7 @@ class LabeledDataset(Dataset):
         return s
 
 
-class LabeledByteSequenceDataset(LabeledDataset):
+class LabeledByteSeqDataset(LabeledDataset):
     def __init__(
         self,
         root: FilePath,
@@ -119,10 +119,10 @@ class LabeledByteSequenceDataset(LabeledDataset):
         *,
         cat: bool = True,
         suffix: Optional[str] = ".binary",
-        length: int = 0x100000,
+        length: int,
         padding: int = 256,
     ) -> None:
-        loader = ByteSequenceLoader(length, padding)
+        loader = ByteSeqLoader(length, padding)
         super().__init__(root, loader, labels, cat=cat, suffix=suffix)
 
 

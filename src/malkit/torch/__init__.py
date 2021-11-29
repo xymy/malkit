@@ -1,7 +1,7 @@
 from . import models
 from .checkpoint import Checkpoint
 from .dataset import (
-    LabeledByteSequenceDataset,
+    LabeledByteSeqDataset,
     LabeledDataset,
     LabeledImageDataset,
     UnlabeledDataset,
@@ -12,7 +12,7 @@ __all__ = [
     "models",
     "Checkpoint",
     "LabeledDataset",
-    "LabeledByteSequenceDataset",
+    "LabeledByteSeqDataset",
     "LabeledImageDataset",
     "UnlabeledDataset",
     "UnlabeledImageDataset",
