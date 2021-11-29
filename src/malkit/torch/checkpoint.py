@@ -32,20 +32,24 @@ class PriorityQueue:
     def __len__(self) -> int:
         return len(self._queue)
 
+    @property
+    def capacity(self) -> int:
+        return self._capacity
+
     def check_priority(self, priority: Union[int, float]) -> bool:
-        if len(self) < self._capacity:
+        if len(self) < self.capacity:
             return True
         return self._cmp(priority, self._queue[-1].priority)
 
     def update(self, priority: Union[int, float], filename: str) -> Optional[Item]:
         last = None
-        if len(self) == self._capacity:
+        if len(self) == self.capacity:
             last = self.pop()
         self.push(priority, filename)
         return last
 
     def push(self, priority: Union[int, float], filename: str) -> None:
-        if len(self) == self._capacity:
+        if len(self) == self.capacity:
             raise ValueError("queue is full")
         item = Item(priority, filename)
         self._queue.append(item)
@@ -95,7 +99,7 @@ class Checkpoint:
             oldpath.unlink(missing_ok=True)
 
     @staticmethod
-    def load(check_dict: Mapping[str, Any], filepath: FilePath, map_location=None) -> None:
+    def load(check_dict: Mapping[str, Any], filepath: FilePath, map_location: Any = None) -> None:
         state_dict = torch.load(filepath, map_location=map_location)
         for key, obj in check_dict.items():
             if key not in state_dict:
