@@ -1,3 +1,4 @@
+from . import models
 from .checkpoint import Checkpoint
 from .dataset import (
     LabeledByteSequenceDataset,
@@ -8,6 +9,7 @@ from .dataset import (
 )
 
 __all__ = [
+    "models",
     "Checkpoint",
     "LabeledDataset",
     "LabeledByteSequenceDataset",
