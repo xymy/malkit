@@ -1,3 +1,4 @@
+from .byte import convert_binary_to_byte_seq, convert_binary_to_byte_seq_parallel
 from .image import convert_binary_to_image, convert_binary_to_image_parallel, resize_image, resize_image_parallel
 from .utils import (
     build_srcs_dsts,
@@ -8,6 +9,8 @@ from .utils import (
 )
 
 __all__ = [
+    "convert_binary_to_byte_seq",
+    "convert_binary_to_byte_seq_parallel",
     "convert_binary_to_image",
     "convert_binary_to_image_parallel",
     "resize_image",
