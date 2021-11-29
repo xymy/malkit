@@ -39,7 +39,7 @@ class ByteSequenceLoader:
         l = len(buffer)
         a = np.frombuffer(buffer, dtype=np.uint8)
         t = torch.empty(self.length, dtype=torch.int32)
-        t[:l] = torch.from_numpy(a)
+        t[:l] = torch.tensor(a, dtype=torch.int32)
         t[l:] = self.padding
         return t
 
