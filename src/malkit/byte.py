@@ -16,13 +16,17 @@ def convert_binary_to_byte_seq(
     """Convert binary file to byte sequence file."""
 
     with open(binary_file, "rb") as f:
-        binary = f.read(length)
-    byte_seq: np.ndarray = np.frombuffer(binary, dtype=np.uint8)
+        buffer = f.read(length)
+
+    # Since PyTorch embedding layer requires int32/int64 as input, we have to
+    # save each byte (plus padding) as int32 instead of int16.
+    byte_seq: np.ndarray = np.frombuffer(buffer, dtype=np.uint8)
     byte_seq = byte_seq.astype(dtype=np.int32)
+
     # Compress byte sequence via gzip.
     with gzip.open(byte_seq_file, "wb") as f:
         f.write(byte_seq.tobytes())
-        padding_length = length - len(binary)
+        padding_length = length - len(buffer)
         if padding_length > 0:
             padding_seq = np.full(padding_length, padding, dtype=np.int32)
             f.write(padding_seq.tobytes())
