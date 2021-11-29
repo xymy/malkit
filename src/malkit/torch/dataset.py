@@ -1,7 +1,9 @@
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
+import numpy as np
 import pandas as pd
+import torch
 from PIL import Image
 from torch.utils.data import Dataset
 
@@ -18,6 +20,22 @@ class PILLoader:
         with open(path, "rb") as f:
             image = Image.open(f)
             return image.convert(self.mode)
+
+
+class ByteSequenceLoader:
+    def __init__(self, length: int, padding: int = 256) -> None:
+        self.length = length
+        self.padding = padding
+
+    def __call__(self, path: FilePath) -> torch.Tensor:
+        with open(path, "rb") as f:
+            buffer = f.read(self.length)
+        l = len(buffer)
+        a = np.frombuffer(buffer, dtype=np.uint8)
+        t = torch.empty(self.length, dtype=torch.int32)
+        t[:l] = torch.from_numpy(a)
+        t[l:] = self.padding
+        return t
 
 
 class LabeledDataset(Dataset):
@@ -111,6 +129,21 @@ class LabeledImageDataset(LabeledDataset):
         if self.target_transform is not None:
             target = self.target_transform(target)
         return sample, target
+
+
+class LabeledByteSequenceDataset(LabeledDataset):
+    def __init__(
+        self,
+        root: FilePath,
+        labels: pd.DataFrame,
+        *,
+        cat: bool = False,
+        suffix: Optional[str] = ".binary",
+        length: int = 0x100000,
+        padding: int = 256,
+    ) -> None:
+        loader = ByteSequenceLoader(length, padding)
+        super().__init__(root, loader, labels, cat=cat, suffix=suffix)
 
 
 class UnlabeledDataset(Dataset):
