@@ -51,7 +51,7 @@ class LabeledDataset(Dataset):
         loader: Callable[[FilePath], Any],
         labels: pd.DataFrame,
         *,
-        cat: bool = False,
+        cat: bool = True,
         suffix: Optional[str] = None,
     ) -> None:
         self.root = Path(root)
@@ -117,7 +117,7 @@ class LabeledByteSequenceDataset(LabeledDataset):
         root: FilePath,
         labels: pd.DataFrame,
         *,
-        cat: bool = False,
+        cat: bool = True,
         suffix: Optional[str] = ".binary",
         length: int = 0x100000,
         padding: int = 256,
@@ -132,7 +132,7 @@ class LabeledImageDataset(LabeledDataset):
         root: FilePath,
         labels: pd.DataFrame,
         *,
-        cat: bool = False,
+        cat: bool = True,
         suffix: Optional[str] = ".png",
         loader_mode: Optional[str] = "L",
         transform: Optional[Callable] = None,
