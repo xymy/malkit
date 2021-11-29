@@ -43,6 +43,7 @@ def split_labels(
     *,
     test_size: Optional[float] = None,
     train_size: Optional[float] = None,
+    random_state: Optional[int] = None,
     shuffle: bool = True,
     stratified: bool = True,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -50,13 +51,18 @@ def split_labels(
 
     from sklearn.model_selection import train_test_split
 
-    indices = np.arange(len(labels))
+    stratify = None
     if shuffle and stratified:
         stratify = labels.iloc[:, 1].to_numpy()
-    else:
-        stratify = None
+
+    indices = np.arange(len(labels))
     idx1, idx2 = train_test_split(
-        indices, test_size=test_size, train_size=train_size, shuffle=shuffle, stratify=stratify
+        indices,
+        test_size=test_size,
+        train_size=train_size,
+        random_state=random_state,
+        shuffle=shuffle,
+        stratify=stratify,
     )
     return labels.iloc[idx1], labels.iloc[idx2]
 
