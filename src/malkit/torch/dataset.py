@@ -9,7 +9,13 @@ from torch.utils.data import Dataset
 
 from .._typing import FilePath
 
-__all__ = ["LabeledDataset", "LabeledImageDataset", "UnlabeledDataset", "UnlabeledImageDataset"]
+__all__ = [
+    "LabeledDataset",
+    "LabeledByteSequenceDataset",
+    "LabeledImageDataset",
+    "UnlabeledDataset",
+    "UnlabeledImageDataset",
+]
 
 
 class PILLoader:
@@ -105,6 +111,21 @@ class LabeledDataset(Dataset):
         return s
 
 
+class LabeledByteSequenceDataset(LabeledDataset):
+    def __init__(
+        self,
+        root: FilePath,
+        labels: pd.DataFrame,
+        *,
+        cat: bool = False,
+        suffix: Optional[str] = ".binary",
+        length: int = 0x100000,
+        padding: int = 256,
+    ) -> None:
+        loader = ByteSequenceLoader(length, padding)
+        super().__init__(root, loader, labels, cat=cat, suffix=suffix)
+
+
 class LabeledImageDataset(LabeledDataset):
     def __init__(
         self,
@@ -129,21 +150,6 @@ class LabeledImageDataset(LabeledDataset):
         if self.target_transform is not None:
             target = self.target_transform(target)
         return sample, target
-
-
-class LabeledByteSequenceDataset(LabeledDataset):
-    def __init__(
-        self,
-        root: FilePath,
-        labels: pd.DataFrame,
-        *,
-        cat: bool = False,
-        suffix: Optional[str] = ".binary",
-        length: int = 0x100000,
-        padding: int = 256,
-    ) -> None:
-        loader = ByteSequenceLoader(length, padding)
-        super().__init__(root, loader, labels, cat=cat, suffix=suffix)
 
 
 class UnlabeledDataset(Dataset):
