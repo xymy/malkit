@@ -16,14 +16,8 @@ class MalConv(nn.Module):
         # 257 = byte (0-255) + padding (256)
         self.embedding = nn.Embedding(257, 8)
 
-        self.conv1 = nn.Sequential(
-            nn.Conv1d(8, 128, kernel_size=500, stride=500, bias=True),
-            nn.ReLU(inplace=True),
-        )
-        self.conv2 = nn.Sequential(
-            nn.Conv1d(8, 128, kernel_size=500, stride=500, bias=True),
-            nn.Sigmoid(),
-        )
+        self.conv1 = nn.Conv1d(8, 128, kernel_size=500, stride=500, bias=True)
+        self.conv2 = nn.Conv1d(8, 128, kernel_size=500, stride=500, bias=True)
 
         self.maxpool = nn.AdaptiveMaxPool1d(1)
         self.fc = nn.Sequential(
@@ -40,7 +34,7 @@ class MalConv(nn.Module):
         x = x.permute(0, 2, 1)
 
         # Perform gated convolution.
-        x = self.conv1(x) * self.conv2(x)
+        x = self.conv1(x) * torch.sigmoid(self.conv2(x))
 
         x = self.maxpool(x)
         x = self.fc(x)
