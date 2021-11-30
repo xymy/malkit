@@ -15,6 +15,7 @@ __all__ = [
     "LabeledByteSeqDataset",
     "LabeledImageDataset",
     "UnlabeledDataset",
+    "UnlabeledByteSeqDataset",
     "UnlabeledImageDataset",
 ]
 
@@ -191,6 +192,19 @@ class UnlabeledDataset(Dataset):
         s += f"    Root directory: {self.root}\n"
         s += f"    Number of samples: {len(self)}\n"
         return s
+
+
+class UnlabeledByteSeqDataset(UnlabeledDataset):
+    def __init__(
+        self,
+        root: FilePath,
+        *,
+        suffix: Optional[str] = "",
+        length: int,
+        padding: int = 256,
+    ) -> None:
+        loader = ByteSeqLoader(length, padding)
+        super().__init__(root, loader, suffix=suffix)
 
 
 class UnlabeledImageDataset(UnlabeledDataset):

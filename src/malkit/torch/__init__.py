@@ -4,6 +4,7 @@ from .dataset import (
     LabeledByteSeqDataset,
     LabeledDataset,
     LabeledImageDataset,
+    UnlabeledByteSeqDataset,
     UnlabeledDataset,
     UnlabeledImageDataset,
 )
@@ -15,5 +16,6 @@ __all__ = [
     "LabeledByteSeqDataset",
     "LabeledImageDataset",
     "UnlabeledDataset",
+    "UnlabeledByteSeqDataset",
     "UnlabeledImageDataset",
 ]
