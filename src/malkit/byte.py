@@ -11,7 +11,12 @@ __all__ = ["convert_binary_to_byte_seq", "convert_binary_to_byte_seq_parallel"]
 
 
 def convert_binary_to_byte_seq(
-    binary_file: FilePath, byte_seq_file: FilePath, *, length: int, padding: int = 256
+    binary_file: FilePath,
+    byte_seq_file: FilePath,
+    *,
+    length: int,
+    padding: int = 256,
+    compresslevel: int = 6,
 ) -> None:
     """Convert binary file to byte sequence file."""
 
@@ -23,13 +28,14 @@ def convert_binary_to_byte_seq(
     byte_seq: np.ndarray = np.frombuffer(buffer, dtype=np.uint8)
     byte_seq = byte_seq.astype(dtype=np.int32)
 
+    padding_length = length - len(byte_seq)
+    if padding_length > 0:
+        padding_seq = np.full(padding_length, padding, dtype=np.int32)
+        byte_seq = np.concatenate([byte_seq, padding_seq])
+
     # Compress byte sequence via gzip.
-    with gzip.open(byte_seq_file, "wb") as f:
+    with gzip.open(byte_seq_file, "wb", compresslevel=compresslevel) as f:
         f.write(byte_seq.tobytes())
-        padding_length = length - len(byte_seq)
-        if padding_length > 0:
-            padding_seq = np.full(padding_length, padding, dtype=np.int32)
-            f.write(padding_seq.tobytes())
 
 
 def convert_binary_to_byte_seq_parallel(
