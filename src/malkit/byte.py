@@ -18,7 +18,7 @@ def convert_binary_to_byte_seq(
     padding: int = 256,
     compresslevel: int = 6,
 ) -> None:
-    """Convert binary file to byte sequence file."""
+    """Convert binary file to byte sequence file. (deprecated)"""
 
     with open(binary_file, "rb") as f:
         buffer = f.read(length)
@@ -47,7 +47,7 @@ def convert_binary_to_byte_seq_parallel(
     n_jobs: Optional[int] = None,
     **kwargs: Any,
 ) -> None:
-    """Convert binary file to byte sequence file in parallel."""
+    """Convert binary file to byte sequence file in parallel. (deprecated)"""
 
     function = functools.partial(convert_binary_to_byte_seq, length=length, padding=padding)
     execute_parallel(function, binary_files, byte_seq_files, n_jobs=n_jobs, **kwargs)

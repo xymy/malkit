@@ -1,4 +1,3 @@
-import gzip
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -36,13 +35,14 @@ class ByteSeqLoader:
         self.padding = padding
 
     def __call__(self, path: FilePath) -> torch.Tensor:
-        # Decompress byte sequence via gzip.
-        with gzip.open(path, "rb") as f:
-            buffer = f.read(self.length * 4)
+        with open(path, "rb") as f:
+            buffer = f.read(self.length)
 
         # Since PyTorch embedding layer requires int32/int64 as input, we have
-        # saved each byte (plus padding) as int32 instead of int16.
-        byte_seq: np.ndarray = np.frombuffer(buffer, dtype=np.int32)
+        # to convert uint8 to int32.
+        byte_seq: np.ndarray = np.frombuffer(buffer, dtype=np.uint8)
+        byte_seq = byte_seq.astype(np.int32)
+
         padding_length = self.length - len(byte_seq)
         if padding_length > 0:
             padding_seq = np.full(padding_length, self.padding, dtype=np.int32)
@@ -124,7 +124,7 @@ class LabeledByteSeqDataset(LabeledDataset):
         labels: pd.DataFrame,
         *,
         cat: bool = True,
-        suffix: Optional[str] = ".byte_seq",
+        suffix: Optional[str] = ".binary",
         length: int,
         padding: int = 256,
     ) -> None:
