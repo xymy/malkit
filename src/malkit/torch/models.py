@@ -1,3 +1,5 @@
+from typing import Optional
+
 import torch
 import torch.nn as nn
 
@@ -10,11 +12,11 @@ class MalConv(nn.Module):
           https://arxiv.org/abs/1710.09435
     """
 
-    def __init__(self, num_classes: int = 2) -> None:
+    def __init__(self, num_classes: int = 2, *, num_embeddings: int = 257, padding_idx: Optional[int] = 256) -> None:
         super().__init__()
 
-        # 257 = byte (0-255) + padding (256)
-        self.embedding = nn.Embedding(257, 8)
+        # By default, num_embeddings (257) = byte (0-255) + padding (256).
+        self.embedding = nn.Embedding(num_embeddings, 8, padding_idx=padding_idx)
 
         self.conv1 = nn.Conv1d(8, 128, kernel_size=500, stride=500)
         self.conv2 = nn.Conv1d(8, 128, kernel_size=500, stride=500)
