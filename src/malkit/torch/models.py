@@ -23,7 +23,12 @@ class MalConv(nn.Module):
         self.relu = nn.ReLU(inplace=True)
 
         self.maxpool = nn.AdaptiveMaxPool1d(1)
-        self.fc = nn.Linear(128, num_classes)
+
+        self.fc = nn.Sequential(
+            nn.Linear(128, 128),
+            nn.ReLU(inplace=True),
+            nn.Linear(128, num_classes),
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.embedding(x)
@@ -36,6 +41,7 @@ class MalConv(nn.Module):
         x = self.relu(x)
 
         x = self.maxpool(x)
+
         x = self.fc(torch.flatten(x, 1))
 
         return x
