@@ -2,6 +2,7 @@ from typing import Optional
 
 import torch
 import torch.nn as nn
+from torch import Tensor
 
 
 class MalConv(nn.Module):
@@ -30,9 +31,12 @@ class MalConv(nn.Module):
             nn.Linear(128, num_classes),
         )
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: Tensor) -> Tensor:
         x = self.embedding(x)
+        x = self.forward_embedding(x)
+        return x
 
+    def forward_embedding(self, x: Tensor) -> Tensor:
         # Treat embedding dimension as channel.
         x = x.permute(0, 2, 1)
 
