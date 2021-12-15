@@ -31,7 +31,11 @@ def _get_image(binary: bytes, *, width: int, drop: bool = False, padding: bytes 
 
 def get_image(binary: bytes, *, width: Union[int, str], drop: bool = False, padding: bytes = b"\x00") -> Image.Image:
     if isinstance(width, str):
-        width = _registry[width](len(binary))
+        try:
+            width = _registry[width](len(binary))
+        except KeyError:
+            keys = "{" + ", ".join(_registry.keys()) + "}"
+            raise ValueError(f"unknown width, expected {keys}")
     return _get_image(binary, width=width, drop=drop, padding=padding)
 
 
@@ -85,7 +89,14 @@ def resize_image_parallel(
     execute_parallel(function, srcs, dsts, n_jobs=n_jobs, **kwargs)
 
 
-def width_function_nkjm(filesize: int) -> int:
+def width_function_nataraj(filesize: int) -> int:
+    """Set width depending on filesize.
+
+    References:
+        - Nataraj et al. 2011. Malware images: visualization and automatic classification.
+          https://doi.org/10.1145/2016904.2016908
+    """
+
     k = filesize // 1024
     if k < 10:
         width = 32
@@ -106,4 +117,4 @@ def width_function_nkjm(filesize: int) -> int:
     return width
 
 
-_registry: Dict[str, Callable[[int], int]] = {"nkjm": width_function_nkjm}
+_registry: Dict[str, Callable[[int], int]] = {"nataraj": width_function_nataraj}
