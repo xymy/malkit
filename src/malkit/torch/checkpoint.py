@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, List, Mapping, Optional, Union
 
 import torch
+import torch.nn as nn
 
 from .._typing import FilePath
 
@@ -90,6 +91,8 @@ class Checkpoint:
 
         state_dict = {}
         for key, obj in check_dict.items():
+            if isinstance(obj, (nn.DataParallel, nn.parallel.DistributedDataParallel)):
+                obj = obj.module
             state_dict[key] = obj.state_dict()
         torch.save(state_dict, self.root / filename)
 
@@ -104,4 +107,6 @@ class Checkpoint:
         for key, obj in check_dict.items():
             if key not in state_dict:
                 raise ValueError(f"{key} does not exist")
+            if isinstance(obj, (nn.DataParallel, nn.parallel.DistributedDataParallel)):
+                obj = obj.module
             obj.load_state_dict(state_dict[key])
