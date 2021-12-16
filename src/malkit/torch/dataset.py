@@ -19,16 +19,6 @@ __all__ = [
 ]
 
 
-class PILLoader:
-    def __init__(self, mode: Optional[str] = None) -> None:
-        self.mode = mode
-
-    def __call__(self, path: FilePath) -> Image.Image:
-        with open(path, "rb") as f:
-            image = Image.open(f)
-            return image.convert(self.mode)
-
-
 class ByteSeqLoader:
     def __init__(self, length: int, padding: int = 256) -> None:
         self.length = length
@@ -48,6 +38,16 @@ class ByteSeqLoader:
             padding_seq = np.full(padding_length, self.padding, dtype=np.int32)
             byte_seq = np.concatenate([byte_seq, padding_seq])
         return torch.tensor(byte_seq)
+
+
+class PILLoader:
+    def __init__(self, mode: Optional[str] = None) -> None:
+        self.mode = mode
+
+    def __call__(self, path: FilePath) -> Image.Image:
+        with open(path, "rb") as f:
+            image = Image.open(f)
+            return image.convert(self.mode)
 
 
 class LabeledDataset(Dataset):
