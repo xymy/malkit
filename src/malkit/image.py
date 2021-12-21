@@ -29,13 +29,17 @@ def _get_image(binary: bytes, *, width: int, drop: bool = False, padding: bytes 
     return Image.frombuffer("L", (width, height), binary, "raw", "L", 0, 1)
 
 
-def get_image(binary: bytes, *, width: Union[int, str], drop: bool = False, padding: bytes = b"\x00") -> Image.Image:
+def get_image(
+    binary: bytes, *, width: Union[int, str, Callable[[int], int]], drop: bool = False, padding: bytes = b"\x00"
+) -> Image.Image:
     if isinstance(width, str):
         try:
             width = _registry[width](len(binary))
         except KeyError:
             keys = "{" + ", ".join(_registry.keys()) + "}"
             raise ValueError(f"unknown width, expected {keys}")
+    elif callable(width):
+        width = width(len(binary))
     return _get_image(binary, width=width, drop=drop, padding=padding)
 
 
