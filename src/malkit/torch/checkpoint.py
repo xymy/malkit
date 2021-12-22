@@ -25,6 +25,7 @@ class PriorityQueue:
         self._queue: List[Item] = []
         self._capacity = capacity
         self._reverse = reverse
+
         if reverse:
             self._cmp = operator.gt
         else:
