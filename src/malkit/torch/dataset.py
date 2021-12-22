@@ -109,12 +109,15 @@ class LabeledDataset(Dataset):
         return len(self.labels)
 
     def __repr__(self) -> str:
-        s = ""
-        s += f"{type(self).__name__}:\n"
+        args = ", ".join(f"{a}={getattr(self, a)!r}" for a in self._args())
+        s = f"{type(self).__name__}({args}):\n"
         s += f"    Root directory: {self.root}\n"
         s += f"    Number of samples: {len(self)}\n"
         s += f"    Number of classes: {len(self.index_to_class)}\n"
         return s
+
+    def _args(self) -> Tuple[str, ...]:
+        return ("cat", "suffix")
 
 
 class LabeledByteSeqDataset(LabeledDataset):
@@ -130,6 +133,11 @@ class LabeledByteSeqDataset(LabeledDataset):
     ) -> None:
         loader = ByteSeqLoader(length, padding)
         super().__init__(root, loader, labels, cat=cat, suffix=suffix)
+        self.length = length
+        self.padding = padding
+
+    def _args(self) -> Tuple[str, ...]:
+        return super()._args() + ("length", "padding")
 
 
 class LabeledImageDataset(LabeledDataset):
@@ -146,6 +154,7 @@ class LabeledImageDataset(LabeledDataset):
     ) -> None:
         loader = PILLoader(loader_mode)
         super().__init__(root, loader, labels, cat=cat, suffix=suffix)
+        self.loader_mode = loader_mode
         self.transform = transform
         self.target_transform = target_transform
 
@@ -156,6 +165,9 @@ class LabeledImageDataset(LabeledDataset):
         if self.target_transform is not None:
             target = self.target_transform(target)
         return sample, target
+
+    def _args(self) -> Tuple[str, ...]:
+        return super()._args() + ("loader_mode",)
 
 
 class UnlabeledDataset(Dataset):
@@ -187,11 +199,14 @@ class UnlabeledDataset(Dataset):
         return len(self._sample_paths)
 
     def __repr__(self) -> str:
-        s = ""
-        s += f"{type(self).__name__}:\n"
+        args = ", ".join(f"{a}={getattr(self, a)!r}" for a in self._args())
+        s = f"{type(self).__name__}({args}):\n"
         s += f"    Root directory: {self.root}\n"
         s += f"    Number of samples: {len(self)}\n"
         return s
+
+    def _args(self) -> Tuple[str, ...]:
+        return ("suffix",)
 
 
 class UnlabeledByteSeqDataset(UnlabeledDataset):
@@ -205,6 +220,11 @@ class UnlabeledByteSeqDataset(UnlabeledDataset):
     ) -> None:
         loader = ByteSeqLoader(length, padding)
         super().__init__(root, loader, suffix=suffix)
+        self.length = length
+        self.padding = padding
+
+    def _args(self) -> Tuple[str, ...]:
+        return super()._args() + ("length", "padding")
 
 
 class UnlabeledImageDataset(UnlabeledDataset):
@@ -218,6 +238,7 @@ class UnlabeledImageDataset(UnlabeledDataset):
     ) -> None:
         loader = PILLoader(loader_mode)
         super().__init__(root, loader, suffix=suffix)
+        self.loader_mode = loader_mode
         self.transform = transform
 
     def __getitem__(self, index: int) -> Tuple[Any, str]:
@@ -225,3 +246,6 @@ class UnlabeledImageDataset(UnlabeledDataset):
         if self.transform is not None:
             sample = self.transform(sample)
         return sample, sample_name
+
+    def _args(self) -> Tuple[str, ...]:
+        return super()._args() + ("loader_mode",)
