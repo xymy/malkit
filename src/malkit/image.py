@@ -13,6 +13,8 @@ __all__ = [
     "resize_image_parallel",
 ]
 
+WidthFunction = Callable[[int], int]
+
 
 def _get_image(binary: bytes, *, width: int, drop: bool = False, padding: bytes = b"\x00") -> Image.Image:
     nbytes = len(binary)
@@ -30,7 +32,7 @@ def _get_image(binary: bytes, *, width: int, drop: bool = False, padding: bytes 
 
 
 def get_image(
-    binary: bytes, *, width: Union[int, str, Callable[[int], int]], drop: bool = False, padding: bytes = b"\x00"
+    binary: bytes, *, width: Union[int, str, WidthFunction], drop: bool = False, padding: bytes = b"\x00"
 ) -> Image.Image:
     if isinstance(width, str):
         try:
@@ -121,4 +123,4 @@ def width_function_nataraj(filesize: int) -> int:
     return width
 
 
-_registry: Dict[str, Callable[[int], int]] = {"nataraj": width_function_nataraj}
+_registry: Dict[str, WidthFunction] = {"nataraj": width_function_nataraj}
