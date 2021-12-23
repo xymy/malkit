@@ -28,7 +28,7 @@ def reduce_parallel(
     n_jobs: Optional[int] = None,
     **kwargs: Any,
 ) -> np.ndarray:
-    """Execute function in parallel."""
+    """Reduce function in parallel."""
 
     delayed_function = delayed(function)
     with Parallel(n_jobs=n_jobs, **kwargs) as parallel:
