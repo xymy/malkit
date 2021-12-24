@@ -1,4 +1,5 @@
 import functools
+import math
 from typing import Any, Iterable, Optional, Tuple
 
 import numpy as np
@@ -40,19 +41,25 @@ def extract_byte_hist_parallel(
 def _get_entropy_and_byte_hist(window: np.ndarray) -> Tuple[np.float64, np.ndarray]:
     byte_hist = np.bincount(window, minlength=256)
     prob = byte_hist / len(window)
-    cond = prob > 0
-    entropy = -np.sum(prob * np.log2(prob, where=cond))
+    mask = prob > 0
+    entropy = -np.sum(prob * np.log2(prob, where=mask))
     return entropy, byte_hist
 
 
 def get_byte_entropy_hist(buffer: bytes, *, window_size: int = 1024, step_size: int = 256) -> np.ndarray:
-    """Get byte entropy histogram."""
+    """Get byte entropy histogram.
+
+    References:
+        - J. Saxe and K. Berlin. 2015.
+          Deep neural network based malware detection using two dimensional binary program features.
+          https://doi.org/10.1109/MALWARE.2015.7413680
+    """
 
     byte_seq = np.frombuffer(buffer, dtype=np.uint8)
     result = np.zeros((16, 256), dtype=np.int64)
     for window in np.lib.stride_tricks.sliding_window_view(byte_seq, window_size)[::step_size]:
         entropy, byte_hist = _get_entropy_and_byte_hist(window)
-        idx = min(int(entropy * 2), 15)
+        idx = min(math.floor(entropy * 2), 15)
         result[idx] += byte_hist
     return result.reshape((16, 16, 16)).sum(-1).reshape(256)
 
