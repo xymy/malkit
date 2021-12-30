@@ -29,7 +29,7 @@ class MalConv(nn.Module):
         self.conv1 = nn.Conv1d(embedding_dim, 128, kernel_size=window_size, stride=window_size)
         self.conv2 = nn.Conv1d(embedding_dim, 128, kernel_size=window_size, stride=window_size)
         self.relu = nn.ReLU(inplace=True)
-
+        self.sigmoid = nn.Sigmoid()
         self.maxpool = nn.AdaptiveMaxPool1d(1)
 
         self.fc = nn.Sequential(
@@ -44,14 +44,16 @@ class MalConv(nn.Module):
         return x
 
     def forward_embedding(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.extract_features(x)
+        x = self.fc(x)
+        return x
+
+    def extract_features(self, x: torch.Tensor) -> torch.Tensor:
         # Treat embedding dimension as channel.
         x = x.permute(0, 2, 1)
 
         # Perform gated convolution.
-        x = self.conv1(x) * torch.sigmoid(self.conv2(x))
-        x = self.relu(x)
-
+        x = self.relu(self.conv1(x)) * self.sigmoid(self.conv2(x))
         x = self.maxpool(x)
 
-        x = self.fc(torch.flatten(x, 1))
-        return x
+        return x.flatten(1)
