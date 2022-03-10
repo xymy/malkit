@@ -1,3 +1,4 @@
+from typing import Tuple
 import numpy as np
 import torch
 
@@ -23,3 +24,6 @@ class BinaryLoader:
             padding = np.full(padding_length, self.padding_value, dtype=np.int32)
             binary = np.concatenate([binary, padding])
         return torch.tensor(binary)
+
+    def _get_args(self) -> Tuple[str, ...]:
+        return ("length", "padding_value")
