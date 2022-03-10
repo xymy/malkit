@@ -1,11 +1,13 @@
 from typing import Tuple
+
 import numpy as np
 import torch
 
 from ..._typing import FilePath
+from . import Loader
 
 
-class BinaryLoader:
+class BinaryLoader(Loader):
     def __init__(self, length: int, padding_value: int = 256) -> None:
         self.length = length
         self.padding_value = padding_value
