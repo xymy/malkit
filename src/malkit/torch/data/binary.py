@@ -6,6 +6,8 @@ import torch
 from ..._typing import FilePath
 from . import Loader
 
+__all__ = ["BinaryLoader"]
+
 
 class BinaryLoader(Loader):
     def __init__(self, length: int, padding_value: int = 256) -> None:

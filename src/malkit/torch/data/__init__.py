@@ -7,6 +7,18 @@ from torch.utils.data import Dataset
 
 from ..._typing import FilePath
 
+__all__ = ["ClassifiedDataset"]
+
+
+class Loader:
+    def __repr__(self) -> str:
+        args = self._get_args()
+        args_str = ", ".join(f"{a}={getattr(self, a)!r}" for a in args)
+        return f"{type(self).__name__}({args_str})"
+
+    def _get_args(self) -> Tuple[str, ...]:
+        return ()
+
 
 class ClassifiedDataset(Dataset):
     def __init__(
@@ -65,13 +77,3 @@ class ClassifiedDataset(Dataset):
         s += f"    Number of samples: {len(self)}\n"
         s += f"    Number of classes: {len(self.index_to_class)}\n"
         return s
-
-
-class Loader:
-    def __repr__(self) -> str:
-        args = self._get_args()
-        args_str = ", ".join(f"{a}={getattr(self, a)!r}" for a in args)
-        return f"{type(self).__name__}({args_str})"
-
-    def _get_args(self) -> Tuple[str, ...]:
-        raise NotImplementedError
