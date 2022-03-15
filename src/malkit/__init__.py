@@ -29,4 +29,4 @@ __all__ = [
     "convert_bytes_to_binary_parallel",
 ]
 
-__version__ = "0.8.1b"
+__version__ = "0.8.2b"
