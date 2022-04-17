@@ -3,6 +3,7 @@ from typing import Any, Callable, Dict, List, Tuple
 
 import pandas as pd
 import torch
+from torch import Tensor
 from torch.utils.data import Dataset
 
 from ..._typing import FilePath
@@ -57,7 +58,7 @@ class ClassifiedDataset(Dataset):
     def class_to_index(self) -> Dict[str, int]:
         return self._class_to_index
 
-    def __getitem__(self, index: int) -> Tuple[Any, torch.Tensor]:
+    def __getitem__(self, index: int) -> Tuple[Any, Tensor]:
         sample_name = self.sample_names[index]
         target_name = self.target_names[index]
 

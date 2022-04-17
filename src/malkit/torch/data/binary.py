@@ -2,6 +2,7 @@ from typing import Tuple
 
 import numpy as np
 import torch
+from torch import Tensor
 
 from ..._typing import FilePath
 from . import Loader
@@ -14,7 +15,7 @@ class BinaryLoader(Loader):
         self.length = length
         self.padding_value = padding_value
 
-    def __call__(self, path: FilePath) -> torch.Tensor:
+    def __call__(self, path: FilePath) -> Tensor:
         with open(path, "rb") as f:
             buffer = f.read(self.length)
 
