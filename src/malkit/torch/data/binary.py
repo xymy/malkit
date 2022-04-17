@@ -5,7 +5,7 @@ import torch
 from torch import Tensor
 
 from ..._typing import FilePath
-from . import Loader
+from ._loader import Loader
 
 __all__ = ["BinaryLoader"]
 

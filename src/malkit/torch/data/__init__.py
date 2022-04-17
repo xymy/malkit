@@ -11,16 +11,6 @@ from ..._typing import FilePath
 __all__ = ["ClassifiedDataset"]
 
 
-class Loader:
-    def __repr__(self) -> str:
-        args = self._get_args()
-        args_str = ", ".join(f"{a}={getattr(self, a)!r}" for a in args)
-        return f"{type(self).__name__}({args_str})"
-
-    def _get_args(self) -> Tuple[str, ...]:
-        return ()
-
-
 class ClassifiedDataset(Dataset):
     def __init__(
         self,
@@ -57,6 +47,12 @@ class ClassifiedDataset(Dataset):
     @property
     def class_to_index(self) -> Dict[str, int]:
         return self._class_to_index
+
+    def get_sample_path(self, index: int) -> Path:
+        sample_name = self.sample_names[index]
+        target_name = self.target_names[index]
+        sample_path = self.root / target_name / sample_name
+        return sample_path
 
     def __getitem__(self, index: int) -> Tuple[Any, Tensor]:
         sample_name = self.sample_names[index]
