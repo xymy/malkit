@@ -19,6 +19,7 @@ class ClassifiedDataset(Dataset):
         loader: Callable[[FilePath], Any],
     ) -> None:
         root = Path(root)
+
         if not root.is_dir():
             raise ValueError(f"{root} is not a directory")
 
