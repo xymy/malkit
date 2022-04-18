@@ -53,6 +53,14 @@ class ClassifiedDataset(Dataset):
         sample_path = self.root / target_name / sample_name
         return sample_path
 
+    def get_sample_path_alter(self, index: int, root: FilePath) -> Path:
+        sample_name = self.sample_names[index]
+        target_name = self.target_names[index]
+        sample_dir = Path(root) / target_name
+        sample_dir.mkdir(parents=True, exist_ok=True)
+        sample_path = sample_dir / sample_name
+        return sample_path
+
     def get_sample(self, index: int) -> Tensor:
         sample_path = self.get_sample_path(index)
         sample = self.loader(sample_path)
