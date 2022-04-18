@@ -18,7 +18,6 @@ class ClassifiedDataset(Dataset):
         loader: Callable[[FilePath], Tensor],
     ) -> None:
         root = Path(root)
-
         if not root.is_dir():
             raise ValueError(f"{root} is not a directory")
 
@@ -67,11 +66,9 @@ class ClassifiedDataset(Dataset):
     def __getitem__(self, index: int) -> Tuple[Tensor, int]:
         sample_name = self.sample_names[index]
         target_name = self.target_names[index]
-
         sample_path = self.root / target_name / sample_name
         sample = self.loader(sample_path)
         target = self.class_to_index[target_name]
-
         return sample, target
 
     def __len__(self) -> int:
