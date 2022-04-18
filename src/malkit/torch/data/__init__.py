@@ -1,8 +1,7 @@
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple
 
 import pandas as pd
-import torch
 from torch import Tensor
 from torch.utils.data import Dataset
 
@@ -16,7 +15,7 @@ class ClassifiedDataset(Dataset):
         self,
         root: FilePath,
         labels: pd.DataFrame,
-        loader: Callable[[FilePath], Any],
+        loader: Callable[[FilePath], Tensor],
     ) -> None:
         root = Path(root)
 
@@ -55,7 +54,17 @@ class ClassifiedDataset(Dataset):
         sample_path = self.root / target_name / sample_name
         return sample_path
 
-    def __getitem__(self, index: int) -> Tuple[Any, Tensor]:
+    def get_sample(self, index: int) -> Tensor:
+        sample_path = self.get_sample_path(index)
+        sample = self.loader(sample_path)
+        return sample
+
+    def get_target(self, index: int) -> int:
+        target_name = self.target_names[index]
+        target = self.class_to_index[target_name]
+        return target
+
+    def __getitem__(self, index: int) -> Tuple[Tensor, int]:
         sample_name = self.sample_names[index]
         target_name = self.target_names[index]
 
@@ -63,7 +72,7 @@ class ClassifiedDataset(Dataset):
         sample = self.loader(sample_path)
         target = self.class_to_index[target_name]
 
-        return sample, torch.tensor(target)
+        return sample, target
 
     def __len__(self) -> int:
         return len(self.sample_names)
