@@ -10,6 +10,7 @@ class Loader:
         raise NotImplementedError
 
     def __repr__(self) -> str:
+        # Format arguments.
         args = self._get_args()
         args_str = ", ".join(f"{a}={getattr(self, a)!r}" for a in args)
         return f"{type(self).__name__}({args_str})"
