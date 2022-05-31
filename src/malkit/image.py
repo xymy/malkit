@@ -7,42 +7,77 @@ from ._parallel import execute_parallel
 from ._typing import FilePath
 
 __all__ = [
+    "get_image",
     "convert_binary_to_image",
     "convert_binary_to_image_parallel",
     "resize_image",
     "resize_image_parallel",
 ]
 
+
+def width_function_nataraj(filesize: int) -> int:
+    """Set width depending on filesize.
+
+    References:
+        - Nataraj et al. 2011. Malware images: visualization and automatic classification.
+          https://doi.org/10.1145/2016904.2016908
+    """
+
+    k = filesize // 1024
+    if k < 10:
+        width = 32
+    elif k < 30:
+        width = 64
+    elif k < 60:
+        width = 128
+    elif k < 100:
+        width = 256
+    elif k < 200:
+        width = 384
+    elif k < 500:
+        width = 512
+    elif k < 1000:
+        width = 768
+    else:
+        width = 1024
+    return width
+
+
 WidthFunction = Callable[[int], int]
 
+_registry: Dict[str, WidthFunction] = {"nataraj": width_function_nataraj}
 
-def _get_image(binary: bytes, *, width: int, drop: bool = False, padding: bytes = b"\x00") -> Image.Image:
-    nbytes = len(binary)
+
+def _check_width(filesize: int, width: Union[int, str, WidthFunction]) -> int:
+    if isinstance(width, str):
+        try:
+            width = _registry[width](filesize)
+        except KeyError:
+            keys = "{" + ", ".join(_registry.keys()) + "}"
+            raise ValueError(f"unknown width, expected {keys}")
+    elif callable(width):
+        width = width(filesize)
+    return width
+
+
+def get_image(
+    buffer: bytes, *, width: Union[int, str, WidthFunction], drop: bool = False, padding: bytes = b"\x00"
+) -> Image.Image:
+    """Get image."""
+
+    nbytes = len(buffer)
+    width = _check_width(nbytes, width)
     height, rem = divmod(nbytes, width)
     if rem != 0:
         # The image height must be at least 1.
         if drop and height > 0:
             nbytes = width * height
-            binary = binary[:nbytes]
+            buffer = buffer[:nbytes]
         else:
             height += 1
             nbytes = width * height
-            binary = binary.ljust(nbytes, padding)
-    return Image.frombuffer("L", (width, height), binary, "raw", "L", 0, 1)
-
-
-def get_image(
-    binary: bytes, *, width: Union[int, str, WidthFunction], drop: bool = False, padding: bytes = b"\x00"
-) -> Image.Image:
-    if isinstance(width, str):
-        try:
-            width = _registry[width](len(binary))
-        except KeyError:
-            keys = "{" + ", ".join(_registry.keys()) + "}"
-            raise ValueError(f"unknown width, expected {keys}")
-    elif callable(width):
-        width = width(len(binary))
-    return _get_image(binary, width=width, drop=drop, padding=padding)
+            buffer = buffer.ljust(nbytes, padding)
+    return Image.frombuffer("L", (width, height), buffer, "raw", "L", 0, 1)
 
 
 def convert_binary_to_image(
@@ -51,8 +86,8 @@ def convert_binary_to_image(
     """Convert binary file to image file."""
 
     with open(binary_file, "rb") as f:
-        binary = f.read()
-    image = get_image(binary, width=width, drop=drop, padding=padding)
+        buffer = f.read()
+    image = get_image(buffer, width=width, drop=drop, padding=padding)
     image.save(image_file)
 
 
@@ -93,34 +128,3 @@ def resize_image_parallel(
 
     function = functools.partial(resize_image, width=width, height=height)
     execute_parallel(function, srcs, dsts, n_jobs=n_jobs, **kwargs)
-
-
-def width_function_nataraj(filesize: int) -> int:
-    """Set width depending on filesize.
-
-    References:
-        - Nataraj et al. 2011. Malware images: visualization and automatic classification.
-          https://doi.org/10.1145/2016904.2016908
-    """
-
-    k = filesize // 1024
-    if k < 10:
-        width = 32
-    elif k < 30:
-        width = 64
-    elif k < 60:
-        width = 128
-    elif k < 100:
-        width = 256
-    elif k < 200:
-        width = 384
-    elif k < 500:
-        width = 512
-    elif k < 1000:
-        width = 768
-    else:
-        width = 1024
-    return width
-
-
-_registry: Dict[str, WidthFunction] = {"nataraj": width_function_nataraj}
