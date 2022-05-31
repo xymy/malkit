@@ -12,7 +12,7 @@ class ClassifiedDataset(Dataset):
     def __init__(
         self,
         root: FilePath,
-        labels: pd.DataFrame,
+        label: pd.DataFrame,
         loader: Callable[[FilePath], Tensor],
     ) -> None:
         root = Path(root)
@@ -20,11 +20,11 @@ class ClassifiedDataset(Dataset):
             raise ValueError(f"{root} is not a directory")
 
         self.root = root
-        self.labels = labels
+        self.label = label
         self.loader = loader
 
-        self._sample_names = [str(item) for item in labels.iloc[:, 0]]
-        self._target_names = [str(item) for item in labels.iloc[:, 1]]
+        self._sample_names = [str(item) for item in label.iloc[:, 0]]
+        self._target_names = [str(item) for item in label.iloc[:, 1]]
 
         self._index_to_class = sorted(set(self._target_names))
         self._class_to_index = {c: i for i, c in enumerate(self._index_to_class)}
