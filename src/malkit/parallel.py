@@ -3,7 +3,7 @@ from typing import Any, Callable, Iterable, Optional
 import numpy as np
 from joblib import Parallel, delayed
 
-from ._typing import FilePath
+from .typing import FilePath
 
 
 def execute_parallel(

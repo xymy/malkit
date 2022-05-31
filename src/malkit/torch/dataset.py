@@ -7,7 +7,7 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset
 
-from .._typing import FilePath
+from ..typing import FilePath
 
 __all__ = [
     "LabeledDataset",

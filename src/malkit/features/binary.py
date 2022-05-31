@@ -5,8 +5,8 @@ from typing import Any, Iterable, Optional, Tuple, cast
 import numpy as np
 from numpy.typing import NDArray
 
-from ._parallel import reduce_parallel
-from ._typing import FilePath
+from ..parallel import reduce_parallel
+from ..typing import FilePath
 
 __all__ = [
     "get_byte_hist",

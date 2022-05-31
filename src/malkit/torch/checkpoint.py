@@ -6,7 +6,7 @@ from typing import Any, List, Mapping, Optional, Union
 import torch
 import torch.nn as nn
 
-from .._typing import FilePath
+from ..typing import FilePath
 
 __all__ = ["Checkpoint"]
 
@@ -41,7 +41,7 @@ class PriorityQueue:
     def check_priority(self, priority: Union[int, float]) -> bool:
         if len(self) < self.capacity:
             return True
-        return self._cmp(priority, self._queue[-1].priority)
+        return bool(self._cmp(priority, self._queue[-1].priority))
 
     def update(self, priority: Union[int, float], filename: str) -> Optional[Item]:
         last = None

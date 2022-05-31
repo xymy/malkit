@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from torch import Tensor
 
-from ..._typing import FilePath
+from ...typing import FilePath
 from ._loader import Loader
 
 __all__ = ["BinaryLoader"]

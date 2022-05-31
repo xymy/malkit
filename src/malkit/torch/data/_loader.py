@@ -2,7 +2,7 @@ from typing import Tuple
 
 from torch import Tensor
 
-from ..._typing import FilePath
+from ...typing import FilePath
 
 
 class Loader:

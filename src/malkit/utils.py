@@ -6,8 +6,8 @@ from typing import Any, Iterable, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from ._parallel import execute_parallel
-from ._typing import FilePath
+from .parallel import execute_parallel
+from .typing import FilePath
 
 __all__ = [
     "categorize_folders",

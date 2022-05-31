@@ -5,7 +5,7 @@ import pandas as pd
 from torch import Tensor
 from torch.utils.data import Dataset
 
-from ..._typing import FilePath
+from ...typing import FilePath
 
 
 class ClassifiedDataset(Dataset):
