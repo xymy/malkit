@@ -14,7 +14,18 @@ __all__ = [
     "resize_image_parallel",
 ]
 
+_registry: Dict[str, Callable[[int], int]] = {}
 
+
+def register_width_function(name: str) -> Callable[[Callable[[int], int]], Callable[[int], int]]:
+    def decorator(func: Callable[[int], int]) -> Callable[[int], int]:
+        _registry[name] = func
+        return func
+
+    return decorator
+
+
+@register_width_function("nataraj")
 def width_function_nataraj(filesize: int) -> int:
     """Set width depending on filesize.
 
@@ -43,12 +54,7 @@ def width_function_nataraj(filesize: int) -> int:
     return width
 
 
-WidthFunction = Callable[[int], int]
-
-_registry: Dict[str, WidthFunction] = {"nataraj": width_function_nataraj}
-
-
-def _check_width(filesize: int, width: Union[int, str, WidthFunction]) -> int:
+def _check_width(filesize: int, width: Union[int, str, Callable[[int], int]]) -> int:
     if isinstance(width, str):
         try:
             width = _registry[width](filesize)
@@ -61,7 +67,7 @@ def _check_width(filesize: int, width: Union[int, str, WidthFunction]) -> int:
 
 
 def get_image(
-    buffer: bytes, *, width: Union[int, str, WidthFunction], drop: bool = False, padding: bytes = b"\x00"
+    buffer: bytes, *, width: Union[int, str, Callable[[int], int]], drop: bool = False, padding: bytes = b"\x00"
 ) -> Image.Image:
     """Get image."""
 
@@ -81,7 +87,12 @@ def get_image(
 
 
 def convert_binary_to_image(
-    binary_file: FilePath, image_file: FilePath, *, width: Union[int, str], drop: bool = False, padding: bytes = b"\x00"
+    binary_file: FilePath,
+    image_file: FilePath,
+    *,
+    width: Union[int, str, Callable[[int], int]],
+    drop: bool = False,
+    padding: bytes = b"\x00",
 ) -> None:
     """Convert binary file to image file."""
 
@@ -95,7 +106,7 @@ def convert_binary_to_image_parallel(
     binary_files: Iterable[FilePath],
     image_files: Iterable[FilePath],
     *,
-    width: Union[int, str],
+    width: Union[int, str, Callable[[int], int]],
     drop: bool = False,
     padding: bytes = b"\x00",
     n_jobs: Optional[int] = None,
