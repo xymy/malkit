@@ -2,6 +2,7 @@ from typing import Any, Callable, Iterable, Optional
 
 import numpy as np
 from joblib import Parallel, delayed
+from numpy.typing import NDArray
 
 from .typing import FilePath
 
@@ -22,12 +23,12 @@ def execute_parallel(
 
 
 def reduce_parallel(
-    function: Callable[[FilePath], np.ndarray],
+    function: Callable[[FilePath], NDArray],
     srcs: Iterable[FilePath],
     *,
     n_jobs: Optional[int] = None,
     **kwargs: Any,
-) -> np.ndarray:
+) -> NDArray:
     """Reduce function in parallel."""
 
     delayed_function = delayed(function)
