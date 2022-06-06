@@ -38,7 +38,7 @@ def extract_byte_seq(binary_file: FilePath, *, length: int, padding_value: int =
     """Extract byte sequence."""
 
     with open(binary_file, "rb") as f:
-        buffer = f.read()
+        buffer = f.read(length)
     return get_byte_seq(buffer, length=length, padding_value=padding_value)
 
 
