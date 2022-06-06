@@ -18,6 +18,8 @@ _registry: Dict[str, Callable[[int], int]] = {}
 
 
 def register_width_function(name: str) -> Callable[[Callable[[int], int]], Callable[[int], int]]:
+    """Register width function."""
+
     def decorator(func: Callable[[int], int]) -> Callable[[int], int]:
         _registry[name] = func
         return func
