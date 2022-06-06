@@ -9,6 +9,9 @@ from ..parallel import reduce_parallel
 from ..typing import FilePath
 
 __all__ = [
+    "get_byte_seq",
+    "extract_byte_seq",
+    "extract_byte_seq_parallel",
     "get_byte_hist",
     "extract_byte_hist",
     "extract_byte_hist_parallel",
@@ -16,6 +19,41 @@ __all__ = [
     "extract_byte_entropy_hist",
     "extract_byte_entropy_hist_parallel",
 ]
+
+
+def get_byte_seq(buffer: bytes, *, length: int, padding_value: int = 256) -> NDArray:
+    """Get byte sequence."""
+
+    # Read as uint8 but convert to int64 for padding.
+    binary = np.frombuffer(buffer[:length], dtype=np.uint8)
+    binary = binary.astype(np.int64)
+    padding_length = length - len(binary)
+    if padding_length > 0:
+        padding = np.full(padding_length, padding_value, dtype=np.int64)
+        binary = np.concatenate([binary, padding])
+    return binary
+
+
+def extract_byte_seq(binary_file: FilePath, *, length: int, padding_value: int = 256) -> NDArray:
+    """Extract byte sequence."""
+
+    with open(binary_file, "rb") as f:
+        buffer = f.read()
+    return get_byte_seq(buffer, length=length, padding_value=padding_value)
+
+
+def extract_byte_seq_parallel(
+    binary_files: Iterable[FilePath],
+    *,
+    length: int,
+    padding_value: int = 256,
+    n_jobs: Optional[int] = None,
+    **kwargs: Any,
+) -> NDArray:
+    """Extract byte sequence in parallel."""
+
+    function = functools.partial(extract_byte_seq, length=length, padding_value=padding_value)
+    return reduce_parallel(function, binary_files, n_jobs=n_jobs, **kwargs)
 
 
 def get_byte_hist(buffer: bytes) -> NDArray:
