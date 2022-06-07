@@ -83,7 +83,9 @@ def _get_entropy_and_byte_hist(window: NDArray) -> Tuple[float, NDArray]:
     byte_hist = np.bincount(window, minlength=256)
     prob = byte_hist / len(window)
     mask = prob > 0
-    entropy = -np.sum(prob * np.log2(prob, where=mask))
+    # Create zeros out array to prevent `np.log2()` from creating uninitialized out array.
+    out = np.zeros_like(prob)
+    entropy = -np.sum(prob * np.log2(prob, out=out, where=mask))
     return float(entropy), byte_hist
 
 
