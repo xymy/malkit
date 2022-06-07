@@ -41,3 +41,9 @@ class MultiLoader(Loader):
 
     def from_buffer(self, buffer: bytes) -> NDArray:
         return np.concatenate([loader.from_buffer(buffer) for loader in self.loaders])
+
+    def _get_args(self) -> Tuple[str, ...]:
+        args: List[str] = []
+        for loader in self.loaders:
+            args.extend(loader._get_args())
+        return tuple(args)
