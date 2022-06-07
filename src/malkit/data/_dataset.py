@@ -1,11 +1,12 @@
 from pathlib import Path
-from typing import Callable, Dict, Iterator, List, Optional, Tuple
+from typing import Dict, Iterator, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 from numpy.typing import NDArray
 
 from ..typing import FilePath
+from ._loader import Loader
 
 
 class ClassifiedDataset:
@@ -13,7 +14,7 @@ class ClassifiedDataset:
         self,
         root: FilePath,
         label: pd.DataFrame,
-        loader: Callable[[FilePath], NDArray],
+        loader: Loader,
     ) -> None:
         root = Path(root)
         if not root.is_dir():
@@ -78,20 +79,17 @@ class ClassifiedDataset:
         return np.stack(X), np.stack(y)
 
     def load_X_y_parallel(self, *, n_jobs: Optional[int] = None) -> Tuple[NDArray, NDArray]:
-        if hasattr(self.loader, "parallel"):
-            paths = []
-            y = []
-            for index in range(len(self)):
-                sample_name = self.sample_names[index]
-                target_name = self.target_names[index]
-                sample_path = self.root / target_name / sample_name
-                target = self.class_to_index[target_name]
-                paths.append(sample_path)
-                y.append(target)
-            # Load from paths in parallel.
-            X = self.loader.parallel(paths, n_jobs=n_jobs)  # type: ignore
-            return X, np.stack(y)
-        return self.load_X_y()
+        paths = []
+        y = []
+        for index in range(len(self)):
+            sample_name = self.sample_names[index]
+            target_name = self.target_names[index]
+            sample_path = self.root / target_name / sample_name
+            target = self.class_to_index[target_name]
+            paths.append(sample_path)
+            y.append(target)
+        X = self.loader.parallel(paths, n_jobs=n_jobs)
+        return X, np.stack(y)
 
     def __iter__(self) -> Iterator[Tuple[NDArray, int]]:
         for index in range(len(self)):

@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Iterable, Optional, Tuple
 
 from numpy.typing import NDArray
 
@@ -7,6 +7,12 @@ from ..typing import FilePath
 
 class Loader:
     def __call__(self, path: FilePath) -> NDArray:
+        raise NotImplementedError
+
+    def parallel(self, paths: Iterable[FilePath], *, n_jobs: Optional[int] = None) -> NDArray:
+        raise NotImplementedError
+
+    def from_buffer(self, buffer: bytes) -> NDArray:
         raise NotImplementedError
 
     def __repr__(self) -> str:
