@@ -97,7 +97,7 @@ class LabeledDataset(Dataset):
         else:
             sample_path = self.root / sample_name
 
-        # If ``suffix`` is an empty string, the suffix will be removed.
+        # If `suffix` is an empty string, the suffix will be removed.
         if self.suffix is not None:
             sample_path = sample_path.with_suffix(self.suffix)
 
